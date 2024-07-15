@@ -1,4 +1,4 @@
-const dummyTasks = [
+export const dummyTasks = [
     {
       id: 't1',
       userId: 'u1',
