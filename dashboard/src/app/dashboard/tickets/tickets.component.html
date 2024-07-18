@@ -1,3 +1,17 @@
+<div>
+    <ul>
+        @for (ticket of tickets; track ticket.id) {
+            <li>
+                <!-- $count is the built-in method in for loops there are many more like: first, last, even, odd... -->
+                <!-- {{ $count }} - <app-ticket /> -->
+                <app-ticket [data]="ticket" (close)="onCloseTicket(ticket.id)"/>
+            </li>
+        } @empty {
+            <p>No Tickets Available</p>
+        }
+    </ul>
+</div>
+
 <div id="new-ticket">
-    <app-new-ticket />    
+    <app-new-ticket (add)="onAdd($event)"/>    
 </div>

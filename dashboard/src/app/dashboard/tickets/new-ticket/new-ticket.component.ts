@@ -1,4 +1,4 @@
-import { afterNextRender, afterRender, AfterViewInit, Component, ContentChildren, effect, ElementRef, viewChild, ViewChild } from '@angular/core';
+import { afterNextRender, afterRender, AfterViewInit, Component, ContentChildren, effect, ElementRef, output, viewChild, ViewChild } from '@angular/core';
 import { ButtonComponent } from '../../../shared/button/button.component';
 import { ControlComponent } from "../../../shared/control/control.component";
 import { FormsModule } from '@angular/forms';
@@ -14,7 +14,8 @@ export class NewTicketComponent implements AfterViewInit {
   // @ViewChild('form') form?: ElementRef<HTMLFormElement>; ----> another way to accessing an element inside the dom
   // private form = viewChild<ElementRef<HTMLFormElement>>('form'); ----> like above but returns signal
   // IMPORTANT: @ContentChildren('input') private control: ElementRef<HTMLFormElement | HTMLTextAreaElement> ----> for when we want to access projected content (using "ng-content")
-
+  // IMPORTANT: using model() you can have two-way binding signal.
+  add = output<{title: string, text: string}>();
   constructor() {
     // NOTE: these two methods(lifecycles) are new in angular and can be registered with help of constructor only
     afterRender(() => {
@@ -37,7 +38,7 @@ export class NewTicketComponent implements AfterViewInit {
   }
 
   onSubmit(titleElement: HTMLInputElement, textElement: HTMLTextAreaElement, formElement: HTMLFormElement) {
-
+    this.add.emit({title: titleElement.value, text: textElement.value});
     // this.form?.nativeElement.reset(); ----> reseting in the above model
     formElement.reset();
   }
