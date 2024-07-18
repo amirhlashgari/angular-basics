@@ -15,7 +15,7 @@ import { Component, ElementRef, HostBinding, HostListener, inject, input, ViewEn
 export class ControlComponent {
   // -------------------------------------IMPORTANT NOTES----------------------------------------
   // @HostBinding('class') className = 'control'; ----> another way to bind class to an element
-  // @HostListener('click') onClick() {console.log("clicked")} ----> another way to bind listener
+  // IMPORTANT: @HostListener('click') onClick() {console.log("clicked")} ----> another way to bind listener(used for creating custom directives)
   // private el = inject(ElementRef); ----> how to access element programmatically(using reference)
   label = input.required<string>();
 
