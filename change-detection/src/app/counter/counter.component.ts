@@ -1,4 +1,4 @@
-import { Component, inject, NgZone, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 
 import { InfoMessageComponent } from '../info-message/info-message.component';
 
@@ -10,7 +10,6 @@ import { InfoMessageComponent } from '../info-message/info-message.component';
   imports: [InfoMessageComponent],
 })
 export class CounterComponent implements OnInit {
-  private zone = inject(NgZone);
   count = signal(0);
 
   get debugOutput() {
@@ -30,12 +29,17 @@ export class CounterComponent implements OnInit {
     //   console.log("would cause unnecessary re-render")
     // }, 4000)
 
-    this.zone.runOutsideAngular(() => {
-      // this way below timeout won't be watched by zonejs change detection
-      setTimeout(() => {
-        console.log("would cause unnecessary re-render")
-      }, 4000)
-    })
+    // this.zone.runOutsideAngular(() => {
+    //   // this way below timeout won't be watched by zonejs change detection
+    //   setTimeout(() => {
+    //     console.log("would cause unnecessary re-render")
+    //   }, 4000)
+    // })
+
+    // NOTE: by going zoneLess this timeout won't be a challenge anymore
+    setTimeout(() => {
+      console.log("would NOT cause unnecessary re-render due to not using zone.js anymore")
+    }, 4000)
   }
 
   onDecrement() {
