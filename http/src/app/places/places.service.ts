@@ -3,12 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, map, tap, throwError } from 'rxjs';
 
 import { Place } from './place.model';
+import { ErrorService } from '../shared/error.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlacesService {
   private httpClient = inject(HttpClient);
+  private errorService = inject(ErrorService);
   private userPlaces = signal<Place[]>([]);
 
   loadedUserPlaces = this.userPlaces.asReadonly();
@@ -37,11 +39,25 @@ export class PlacesService {
       .pipe(catchError((err) => {
         // to avoid optimistic update if request fails
         this.userPlaces.set(prevPlaces);
-        return throwError(() => new Error('failed to update favorite places'))
+        this.errorService.showError('failed to update favorite places');
+        return throwError(() => new Error('failed to update favorite places'));
       }));
   }
 
-  removeUserPlace(place: Place) { }
+  removeUserPlace(place: Place) {
+    const prevPlaces = this.userPlaces();
+
+    if (prevPlaces.some((p) => p.id === place.id)) {
+      this.userPlaces.set(prevPlaces.filter(p => p.id !== place.id));
+    }
+
+    return this.httpClient.delete('http://localhost:3000/user-places' + place.id)
+      .pipe(catchError((err) => {
+        this.userPlaces.set(prevPlaces);
+        this.errorService.showError('failed to remove favorite places');
+        return throwError(() => new Error('failed to remove favorite places'));
+      }));
+  }
 
   private fetchPlaces(url: string, errorMessage: string) {
     // this.httpClient.get<{ places: Place[] }>('http://localhost:3000/places', { observe: 'events | response' }) ---> this option would cause see full response object
