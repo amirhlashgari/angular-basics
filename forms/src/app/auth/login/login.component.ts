@@ -1,14 +1,18 @@
 import { Component } from '@angular/core';
-import { FormsModule, NgForm } from '@angular/forms';
+import { ReactiveFormsModule, FormControl, FormGroup, NgForm } from '@angular/forms';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [FormsModule],
+    imports: [ReactiveFormsModule],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css',
 })
 export class LoginComponent {
+    form = new FormGroup({
+        email: new FormControl(''),
+        password: new FormControl('')
+    });
 
-    onSubmit(formData: NgForm) {}
+    onSubmit(formData: NgForm) { }
 }

@@ -6,7 +6,7 @@ import { debounceTime } from 'rxjs';
   selector: 'app-login-td',
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './login.component.html',
+  templateUrl: './login-td.component.html',
   styleUrl: './login.component.css',
 })
 export class TemplateDrivenLoginComponent {
