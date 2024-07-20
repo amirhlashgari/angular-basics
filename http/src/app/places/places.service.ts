@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { catchError, map, tap, throwError } from 'rxjs';
 
 import { Place } from './place.model';
 
@@ -6,15 +8,47 @@ import { Place } from './place.model';
   providedIn: 'root',
 })
 export class PlacesService {
+  private httpClient = inject(HttpClient);
   private userPlaces = signal<Place[]>([]);
 
   loadedUserPlaces = this.userPlaces.asReadonly();
 
-  loadAvailablePlaces() {}
+  loadAvailablePlaces() {
+    return this.fetchPlaces('http://localhost:3000/places', 'something went wrong when fetching places');
+  }
 
-  loadUserPlaces() {}
+  loadUserPlaces() {
+    return this.fetchPlaces('http://localhost:3000/user-places', 'something went wrong when fetching user places')
+      .pipe(
+        tap({ // NOTE: we use tap() operator to update data without subscribing to it
+          next: (userPlaces) => this.userPlaces.set(userPlaces)
+        })
+      );
+  }
 
-  addPlaceToUserPlaces(place: Place) {}
+  addPlaceToUserPlaces(place: Place) {
+    const prevPlaces = this.userPlaces();
 
-  removeUserPlace(place: Place) {}
+    if (!prevPlaces.some((p) => p.id === place.id)) {
+      this.userPlaces.set([...prevPlaces, place]);
+    }
+
+    return this.httpClient.put('http://localhost:3000/user-places', { placeId: place.id })
+      .pipe(catchError((err) => {
+        // to avoid optimistic update if request fails
+        this.userPlaces.set(prevPlaces);
+        return throwError(() => new Error('failed to update favorite places'))
+      }));
+  }
+
+  removeUserPlace(place: Place) { }
+
+  private fetchPlaces(url: string, errorMessage: string) {
+    // this.httpClient.get<{ places: Place[] }>('http://localhost:3000/places', { observe: 'events | response' }) ---> this option would cause see full response object
+    return this.httpClient.get<{ places: Place[] }>(url)
+      .pipe(
+        map((resData) => resData.places), // map is rxjs operator, that changes data before reaching to subscribe. all of them can be applied using pipe()
+        catchError((err) => throwError(() => new Error(errorMessage))) // throwError() is applied to return an observable
+      )
+  }
 }
