@@ -1,10 +1,10 @@
 import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { catchError, map, throwError } from 'rxjs';
 
 import { Place } from '../place.model';
 import { PlacesComponent } from '../places.component';
 import { PlacesContainerComponent } from '../places-container/places-container.component';
-import { catchError, map, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-available-places',
@@ -42,6 +42,16 @@ export class AvailablePlacesComponent implements OnInit {
 
     this.destroyRef.onDestroy(() => {
       subscription.unsubscribe();
+    });
+  }
+
+  onSelectPlace(selectedPlace: Place) {
+    // unless you don't subscribe the request it won't send the request (this is how observables work, if there is no subscribe on it it won't go to action)
+    this.httpClient.put('http://localhost:3000/user-places', { placeId: selectedPlace.id })
+    .subscribe({
+      next: (resData) => {
+        console.log(resData);
+      }
     });
   }
 }
