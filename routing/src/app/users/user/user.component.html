@@ -1,5 +1,6 @@
 <div>
-  <a>
+  <!-- we use "routerLink" over "href" attribute to navigate because if we use "href" it would cause refresh each time route changes -->
+  <a routerLink="/task">
     <img [src]="imagePath()" [alt]="user().name" />
     <span>{{ user().name }}</span>
   </a>
